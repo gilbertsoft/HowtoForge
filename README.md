@@ -1,2 +1,2 @@
 # HowtoForge
-Tutorials for HowtoForge.com
+Tutorials for https://www.HowtoForge.com
