@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+<!--
+.command {
+    padding: 1em;
+    border: 1px dashed #2f6fab;
+    color: black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
+        font-family: Courier New, Courier, mono;
+        font-size: 12px;
+        font-style: italic;
+}
+
+.system {
+    color: black;
+        font-family: Courier New, Courier, mono;
+        font-size: 12px;
+        font-style: italic;
+}
+
+.highlight {
+    color: #FF0000;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	text-decoration: underline;
+}
+-->
+</style>
+</head>
+<body>
+<h1>How to install PHP 7.x as PHP-FPM &amp; FastCGI for ISPConfig 3.1 on Debian 8 (Jessie) or Debian 9 (Stretch)</h1>
+<p>The final version of PHP 7.1 is available now. PHP 7.1 is the next generation of the PHP programming language, it is up to 2 times faster than PHP 5.6 and 14 times faster than PHP 5.0 according to the release notes. The new PHP version is not 100% compatible with PHP 5.x as some deprecated API's have been removed, so it is a good idea to start testing your web sites for compatibility with this new release. This can be done easily and without affecting all sites on your server by using the multi PHP version feature in ISPConfig 3. The PHP version can be selected in the ISPConfig 3 website settings for each site individually. This feature works with PHP-FPM and FastCGI. This tutorial shows how to install PHP 7.x as a PHP-FPM and a FastCGI version on a Debian Jessie or Stretch server from the Debian PHP Package maintainers site directly.</p>
+<h2>1 Preliminary Note</h2>
+<p>I will install PHP directly from Debian PHP Package maintainers site <a href="https://packages.sury.org/php/"> https://packages.sury.org/php/</a> with <span class="system">apt-get</span>. This will not overwrite the existing installation but will change the default used PHP version to the newest installed one! So it is very important to add a new PHP version for the installed version to ISPConfig and change all sites to this version first. If you are using cron jobs calling PHP scripts you have to adapt them too, later more on that.</p>
+<p class="highlight">Because other packages as openssl are updated too, the installed packages from sury.org can not simply removed after installation. You first have to downgrade this packages to the Debian versions before you are able to remove the PHP packages without breaking other packages. The simplest way for me was to deactivate the new added repository, then installed packages from sury.org will apear as self created or deprecated packages in <span class="system">aptitude</span> and you are able to downgrade package after package.</p>
+<p>Please note that PHP-FPM can be used on both Apache and Nginx servers while FastCGI is available for Apache servers only.</p>
+<h2>2 Enable PHP versions in ISPConfig</h2>
+<p>In ISPConfig 3, you can configure the new PHP versions under <span class="system">System &gt; Additional PHP Versions</span>.</p>
+<h3>Add Debian's PHP version</h3>
+<p class="highlight">You can skip this step if you do not have a Debian version of PHP installed.</p>
+<p>First of all you have to add a new version for the already installed PHP version. On the <span class="system">Name</span> tab, you just fill in a name for the PHP version (e.g. <span class="system">Debian 5.6</span>) - this PHP version will be listed under this name in the website settings in ISPConfig:</p>
+<p><a class="fancybox" id="img-php-7.1-name_" href="https://www.howtoforge.com/images/install-php-7.1-on-debian-8/big/php-7.1-name_.png"><img src="https://www.howtoforge.com/images/install-php-7.1-on-debian-8/php-7.1-name_.png" alt="Enter the name of the custom PHP version" width="550" height="358"/></a></p>
+<p>Go to the <span class="system">FastCGI Settings</span> tab and fill out the fields as follows:</p>
+<p class="system"><strong>Path to the PHP FastCGI binary:</strong> php5-cgi<br/><strong>Path to the php.ini directory:</strong> /etc/php5/cgi/php.ini</p>
+<p><a class="fancybox" id="img-php-7.1-fastcgi_" href="https://www.howtoforge.com/images/install-php-7.1-on-debian-8/big/php-7.1-fastcgi_.png"><img src="https://www.howtoforge.com/images/install-php-7.1-on-debian-8/php-7.1-fastcgi_.png" alt="PHP 7.1 FastCGI" width="550" height="358"/></a></p>
+<p>Then go to the <span class="system">PHP-FPM Settings</span> tab and fill out the fields as follows:</p>
+<p class="system"><strong>Path to the PHP-FPM init script:</strong> php5-fpm<br/><strong>Path to the php.ini directory:</strong> /etc/php5/fpm/php.ini<br/><strong>Path to the PHP-FPM pool directory:</strong> /etc/php5/fpm/pool.d</p>
+<p><a class="fancybox" id="img-php-7.1-fpm_" href="https://www.howtoforge.com/images/install-php-7.1-on-debian-8/big/php-7.1-fpm_.png"><img src="https://www.howtoforge.com/images/install-php-7.1-on-debian-8/php-7.1-fpm_.png" alt="PHP 7.1 FPM settings" width="550" height="358"/></a></p>
+<h4 class="highlight">Important step for cron jobs</h4>
+<p>If you use cron jobs calling PHP scripts you also have to tell cron which version to use. Add <span class="system">php5 </span> in the beginning of the command to use the Debian's version. If you are not shure what you exactly are using follow the symlink <span class="system">/usr/bin/php</span> and use its final destination as prefix.</p>
+<h3>Add other PHP versions</h3>
+Currently there are 3 versions available at <a href="https://packages.sury.org/php/"> https://packages.sury.org/php/</a> and you have to repeat the last step now for every version you will install. But use the following settings instead:</p>
+<h4>PHP 5.6</h4>
+<p class="system"><strong>Path to the PHP FastCGI binary:</strong> php-cgi5.6<br/><strong>Path to the php.ini directory:</strong> /etc/php/5.6/cgi/php.ini</p>
+<p class="system"><strong>Path to the PHP-FPM init script:</strong> php-fpm5.6<br/><strong>Path to the php.ini directory:</strong> /etc/php/5.6/fpm/php.ini<br/><strong>Path to the PHP-FPM pool directory:</strong> /etc/php/5.6/fpm/pool.d</p>
+<p>The cli version for e.g. cron jobs has the name <span class="system">php5.6</span>.</p>
+<h4>PHP 7.0</h4>
+<p class="system"><strong>Path to the PHP FastCGI binary:</strong> php-cgi7.0<br/><strong>Path to the php.ini directory:</strong> /etc/php/7.0/cgi/php.ini</p>
+<p class="system"><strong>Path to the PHP-FPM init script:</strong> php-fpm7.0<br/><strong>Path to the php.ini directory:</strong> /etc/php/7.0/fpm/php.ini<br/><strong>Path to the PHP-FPM pool directory:</strong> /etc/php/7.0/fpm/pool.d</p>
+<p>The cli version for e.g. cron jobs has the name <span class="system">php7.0</span>.</p>
+<h4>PHP 7.1</h4>
+<p class="system"><strong>Path to the PHP FastCGI binary:</strong> php-cgi7.1<br/><strong>Path to the php.ini directory:</strong> /etc/php/7.1/cgi/php.ini</p>
+<p class="system"><strong>Path to the PHP-FPM init script:</strong> php-fpm7.1<br/><strong>Path to the php.ini directory:</strong> /etc/php/7.1/fpm/php.ini<br/><strong>Path to the PHP-FPM pool directory:</strong> /etc/php/7.1/fpm/pool.d</p>
+<p>The cli version for e.g. cron jobs has the name <span class="system">php7.1</span>.</p>
+<h2>3 Change PHP version of websites</h2>
+<p class="highlight">You can skip this step if you do not have a Debian version of PHP installed.</p>
+<p>Now change the PHP version of all websites to the newly created version (e.g. <span class="system">Debian 5.6</span>).</p>
+<p>And do not forget to change the cron jobs as mentioned above.</p>
+<h2>4 Add the repository at packages.sury.org</h2>
+<p>To add the repository at packages.sury.org and its BGP keys to <span class="system">apt</span> use this command:</p>
+<p class="command">apt-get install apt-transport-https lsb-release ca-certificates<br/>wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg<br/>echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list<br/>apt-get update</p>
+<p class="highlight">Only packages for Debian 8 (Jessie) and Debian 9 (Stretch) are available, do not use it for other releases!</p>
+<p>To to upgrade already installed packages from the new repository use this command:</p>
+<p class="command">apt-get upgrade</p>
+<h2>5 Install PHP from packages.sury.org</h2>
+<p>I am offering here multiple options to install, please pick the desired versions and simply skip the rest!</p>
+<h3>5.1 Install PHP 5.6</h3>
+<p>To install PHP use this command:</p>
+<p class="command">apt-get install php5.6 php5.6-cli php5.6-cgi php5.6-fpm</p>
+<h3>5.2 Install PHP 7.0</h3>
+<p>To install PHP use this command:</p>
+<p class="command">apt-get install php7.0 php7.0-cli php7.0-cgi php7.0-fpm</p>
+<h3>5.3 Install PHP 7.1</h3>
+<p>To install PHP use this command:</p>
+<p class="command">apt-get install php7.1 php7.1-cli php7.1-cgi php7.1-fpm</p>
+<h3>5.4 Install the lastest PHP version</h3>
+<p>To install the lastest PHP version use this command:</p>
+<p class="command">apt-get install php php-cli php-cgi php-fpm</p>
+<h2>6 Install Memcache extension (optional)</h2>
+<p>To install Memcache use this command:</p>
+<p class="command">apt-get install php-memcache php-memcached</p>
+<h2>7 Install APCu extension (optional)</h2>
+<p>To install APC user cache use this command:</p>
+<p class="command">apt-get install php-apcu php-apcu-bc</p>
+<h2>8 Install xDebug extension (optional)</h2>
+<p>The <a href="https://xdebug.org/docs/install">xDebug</a> module is a debugging extension for PHP. The installation is optional.</p>
+<p>To install xDebug use this command:</p>
+<p class="command">apt-get install php-xdebug</p>
+<p class="highlight">This package seems to have other default settings than the Debian package <span class="system">php5-xdebug</span>. Depending on your software you have to change settings like <span class="system">xdebug.max_nesting_level</span> to get it running!</p>
+<h2>9 Install other extensions (optional)</h2>
+<p>There are a lot of additional extensions you can install for PHP. Here is a list of available packages, some of them you have to install for each version separately. Simply delete packages you are not going to use from the following commands:</p>
+<h3>9.1 Version independent packages</h3>
+<p class="command">apt-get install </p>
+<h3>9.2 Version dependent packages</h3>
+<p class="command">apt-get install </p>
+<p></p>
+<h2>10 Restart FPM daemon</h2>
+<p>Finally restart the php-fpm daemon, pick the installed ones:</p>
+<p class="command">service php5.6-fpm restart</p>
+<p class="command">service php7.0-fpm restart</p>
+<p class="command">service php7.1-fpm restart</p>
+<p></p>
+<h2>11 Links</h2>
+<ul>
+<li>PHP: <a href="http://www.php.net/">http://www.php.net/</a></li>
+<li>ISPConfig: <a href="http://www.ispconfig.org/">http://www.ispconfig.org/</a></li>
+<li>Debian: <a href="http://www.debian.org/">http://www.debian.org/</a></li>
+<li>DEB.SURY.ORG: <a href="http://deb.sury.org/">http://deb.sury.org/</a></li>
+</ul>
+</body>
+</html>
